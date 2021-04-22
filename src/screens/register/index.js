@@ -11,6 +11,7 @@ function Register() {
             url: process.env.REACT_APP_REGISTER_URL,
             handleCodeInApp: true
         }
+       
         await auth.sendSignInLinkToEmail(email, config)
         toast.success(`Email send to ${email} .click the link to login`)
         window.localStorage.setItem('emailForRegisteration', email)

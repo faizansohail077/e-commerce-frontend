@@ -9,6 +9,7 @@ import CompleteRegister from './screens/RegisterComplete';
 import { useEffect } from 'react';
 import { auth } from './firebase';
 import { useDispatch } from 'react-redux'
+import ForgotPassword from './screens/ForgotPassword';
 
 function App() {
   const dispatch = useDispatch()
@@ -36,6 +37,9 @@ function App() {
         <Route exact path="/Login" component={Login} />
         <Route exact path="/Signup" component={Register} />
         <Route exact path="/register/complete" component={CompleteRegister} />
+        ForgotPassword
+        <Route exact path="/forgot/password" component={ForgotPassword} />
+
         <Route exact path="/" component={Home} />
       </Switch>
     </Router>
