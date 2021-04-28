@@ -1,12 +1,24 @@
 import { useEffect, useState } from 'react'
 import { auth } from '../../firebase'
 import { toast, ToastContainer } from 'react-toastify'
+import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
 import 'react-toastify/dist/ReactToastify.css'
+
+const createOrUpdateUser = async (authtoken) => {
+    return await axios({
+        url: 'http://localhost:8000/api/auth/signup',
+        method: 'POST',
+        headers: {
+            authtoken: authtoken
+        }
+    })
+}
 
 function CompleteRegister({ history }) {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-
+    const dispatch = useDispatch()
     useEffect(() => {
         setEmail(window.localStorage.getItem('emailForRegisteration'),
         )
@@ -20,7 +32,22 @@ function CompleteRegister({ history }) {
                 window.localStorage.removeItem('emailForRegisteration')
                 const user = await auth.currentUser
                 await user.updatePassword(password)
-                const idToken = user.getIdTokenResult()
+                const idTokenResult = user.getIdTokenResult()
+                let token = (await idTokenResult).token
+                createOrUpdateUser(token)
+                    .then(res => {
+                        console.log("TCL ~ file: index.js ~ line 40 ~ handleSubmit ~ res", res)
+                        dispatch({
+                            type: 'LOGGED_IN_USER', payload: {
+                                name: res.data.name,
+                                email: res.data.email,
+                                token: token,
+                                role: res.data.role,
+                                _id: res.data._id
+                            }
+                        })
+                    })
+                    .catch(err => console.log('this is error', err.message))
                 history.push('/')
             }
         } catch (error) {

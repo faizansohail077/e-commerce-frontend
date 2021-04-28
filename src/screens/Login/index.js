@@ -5,6 +5,17 @@ import { Button } from 'antd'
 import { GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+
+const createOrUpdateUser = async (authtoken) => {
+    return await axios({
+        method: 'POST',
+        url: 'http://localhost:8000/api/auth/signup',
+        headers: {
+            authToken: authtoken
+        }
+    })
+}
 
 function Login({ history }) {
     const [email, setEmail] = useState('')
@@ -19,20 +30,36 @@ function Login({ history }) {
         }
     }, [state])
 
+    const rolebaseRdirect = (res) => {
+        if (res.data.role == 'admin') {
+            history.push('/admin/dashboard')
+        }
+        else {
+            history.push('/user/history')
+        }
+    }
     const LoginForm = async (e) => {
         e.preventDefault()
         setLoading(true)
         try {
             const result = await auth.signInWithEmailAndPassword(email, password)
             const { user } = result
-            const idToken = await user.getIdTokenResult()
-            dispatch({
-                type: 'LOGGED_IN_USER', payload: {
-                    email: user.email,
-                    token: idToken.token
-                }
-            })
-            history.push('/')
+            const idTokenResult = await user.getIdTokenResult()
+            createOrUpdateUser(idTokenResult.token)
+                .then(res => {
+                    dispatch({
+                        type: 'LOGGED_IN_USER', payload: {
+                            name: res.data.name,
+                            email: res.data.email,
+                            token: idTokenResult.token,
+                            role: res.data.role,
+                            _id: res.data._id
+                        }
+                    })
+                    rolebaseRdirect(res)
+                })
+                .catch(err => console.log('this is error', err.message))
+
         } catch (e) {
             console.log(e.message)
             toast.error(e.message)
@@ -43,14 +70,21 @@ function Login({ history }) {
         await auth.signInWithPopup(googleProvider)
             .then(async (res) => {
                 const { user } = res
-                const idToken = await user.getIdTokenResult()
-                dispatch({
-                    type: 'LOGGED_IN_USER', payload: {
-                        email: user.email,
-                        token: idToken.token
-                    }
-                })
-                history.push('/')
+                const idTokenResult = await user.getIdTokenResult()
+                createOrUpdateUser(idTokenResult.token)
+                    .then(res => {
+                        dispatch({
+                            type: 'LOGGED_IN_USER', payload: {
+                                name: res.data.name,
+                                email: res.data.email,
+                                token: idTokenResult.token,
+                                role: res.data.role,
+                                _id: res.data._id
+                            }
+                        })
+                        rolebaseRdirect(res)
+                    })
+                    .catch(err => console.log('this is error', err.message))
             })
             .catch(error => {
                 console.log(error.message)
