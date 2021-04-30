@@ -4,16 +4,9 @@ import { toast, ToastContainer } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import 'react-toastify/dist/ReactToastify.css'
+import { createOrUpdateUser } from '../../functions'
 
-const createOrUpdateUser = async (authtoken) => {
-    return await axios({
-        url: 'http://localhost:8000/api/auth/signup',
-        method: 'POST',
-        headers: {
-            authtoken: authtoken
-        }
-    })
-}
+
 
 function CompleteRegister({ history }) {
     const [email, setEmail] = useState('')
@@ -36,7 +29,6 @@ function CompleteRegister({ history }) {
                 let token = (await idTokenResult).token
                 createOrUpdateUser(token)
                     .then(res => {
-                        console.log("TCL ~ file: index.js ~ line 40 ~ handleSubmit ~ res", res)
                         dispatch({
                             type: 'LOGGED_IN_USER', payload: {
                                 name: res.data.name,

@@ -10,47 +10,19 @@ import { useEffect } from 'react';
 import { auth } from './firebase';
 import { useDispatch } from 'react-redux'
 import ForgotPassword from './screens/ForgotPassword';
-import axios from 'axios'
-import Admin from './screens/admin';
+import Admin from './screens/Admin';
 import UserDashboard from './screens/userDashboard';
 import UserRoute from './components/Routes/UserRoute';
 import Wishlist from './screens/userDashboard/components/WishList';
 import Password from './screens/userDashboard/components/Password/index.';
+import AdminRoute from './components/Routes/AdminRoute';
+import { callUser } from './functions';
 
-const callUser = async (authtoken) => {
-  return await axios({
-    url: 'http://localhost:8000/api/auth/currentUser',
-    method: 'POST',
-    headers: {
-      authtoken: authtoken
-    }
-  })
-}
-
-function PrivateRoute({ children, ...rest }) {
-  let auth = true;
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        auth.user ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/login",
-              state: { from: location }
-            }}
-          />
-        )
-      }
-    />
-  );
-}
 
 
 function App() {
   const dispatch = useDispatch()
+
   useEffect(() => {
     const unsubcribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -81,12 +53,13 @@ function App() {
         <Route exact path="/Login" component={Login} />
         <Route exact path="/Signup" component={Register} />
         <Route exact path="/register/complete" component={CompleteRegister} />
+        <Route exact path="/forgot/password" component={ForgotPassword} />
         <Route exact path="/admin/dashboard" component={Admin} />
+        <Route exact path="/" component={Home} />
         <UserRoute exact path="/user/history" component={UserDashboard} />
         <UserRoute exact path="/user/password" component={Password} />
         <UserRoute exact path="/user/wishlist" component={Wishlist} />
-        <Route exact path="/forgot/password" component={ForgotPassword} />
-        <Route exact path="/" component={Home} />
+        <AdminRoute exact path="/admin/dashboard" component={Admin} />
       </Switch>
     </Router>
   );

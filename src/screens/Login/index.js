@@ -6,16 +6,8 @@ import { GoogleOutlined, MailOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import { createOrUpdateUser } from '../../functions';
 
-const createOrUpdateUser = async (authtoken) => {
-    return await axios({
-        method: 'POST',
-        url: 'http://localhost:8000/api/auth/signup',
-        headers: {
-            authToken: authtoken
-        }
-    })
-}
 
 function Login({ history }) {
     const [email, setEmail] = useState('')
@@ -25,13 +17,13 @@ function Login({ history }) {
     const state = useSelector(state => state.userReducer)
 
     useEffect(() => {
-        if (state?.email) {
+        if (state?.token) {
             history.push('/')
         }
     }, [state])
 
     const rolebaseRdirect = (res) => {
-        if (res.data.role == 'admin') {
+        if (res.data.role === 'admin') {
             history.push('/admin/dashboard')
         }
         else {

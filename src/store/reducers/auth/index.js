@@ -1,4 +1,4 @@
-export function userReducer(state = null, action) {
+export function userReducer(state = [], action) {
     switch (action.type) {
         case 'LOGGED_IN_USER':
             return action.payload
